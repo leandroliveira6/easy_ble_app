@@ -25,7 +25,6 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print('DeviceListWidget');
     return StreamBuilder(
       stream: _bluetoothState,
       builder: (BuildContext context, AsyncSnapshot snapshot) {

@@ -17,6 +17,15 @@ class CharacteristicItemWidget extends StatelessWidget {
       future: BlocProvider.getBloc<DeviceBloc>().getDescriptors(characteristic),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
+          String characteristicName, characteristicDescription;
+          if (snapshot.data.length < 2) {
+            characteristicName = 'Nome para a característica não fornecido';
+            characteristicDescription = 'Descrição para a característica não fornecida';
+          } else {
+            characteristicName = snapshot.data[0];
+            characteristicDescription = snapshot.data[1];
+          }
+
           Widget detail;
           if (characteristic.isReadable) {
             detail = CharacteristicDetailOutputWidget(characteristic);
@@ -32,7 +41,7 @@ class CharacteristicItemWidget extends StatelessWidget {
               children: <Widget>[
                 ListTile(
                   title: Text(
-                    snapshot.data[0],
+                    characteristicName,
                     overflow: TextOverflow.clip,
                   ),
                   trailing: IconButton(
@@ -48,7 +57,7 @@ class CharacteristicItemWidget extends StatelessWidget {
                               textScaleFactor: 1.5,
                             ),
                             content: Text(
-                              snapshot.data[1],
+                              characteristicDescription,
                               textAlign: TextAlign.center,
                               textScaleFactor: 1.2,
                             ),

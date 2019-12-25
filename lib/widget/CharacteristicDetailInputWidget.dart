@@ -17,7 +17,6 @@ class _CharacteristicDetailInputWidgetState extends State<CharacteristicDetailIn
 
   @override
   Widget build(BuildContext context) {
-    print('CharacteristicDetailInputWidget');
     return TextField(
       controller: _inputTextController,
       decoration: InputDecoration(

@@ -9,19 +9,26 @@ class ServiceWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('ServiceWidget');
     return FutureBuilder(
       future: BlocProvider.getBloc<DeviceBloc>().getDescriptors(characteristic),
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasData) {
-          print(snapshot.data);
+          String serviceName, serviceDescription;
+          if (snapshot.data.length < 2) {
+            serviceName = 'Nome para o serviço não fornecido';
+            serviceDescription = 'Descrição para o serviço não fornecida';
+          } else {
+            serviceName = snapshot.data[0];
+            serviceDescription = snapshot.data[1];
+          }
+          
           return ListTile(
             title: Text(
-              snapshot.data[0],
+              serviceName,
               overflow: TextOverflow.clip,
               softWrap: false,
             ),
-            subtitle: Text(snapshot.data[1]),
+            subtitle: Text(serviceDescription),
           );
         }
         return Center(child: CircularProgressIndicator());

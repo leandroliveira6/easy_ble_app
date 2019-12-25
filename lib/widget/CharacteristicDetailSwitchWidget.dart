@@ -9,7 +9,6 @@ class CharacteristicDetailSwitchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('CharacteristicDetailSwitchWidget');
     return Row(
       children: <Widget>[
         Expanded(

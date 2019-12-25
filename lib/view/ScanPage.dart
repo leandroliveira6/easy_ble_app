@@ -8,7 +8,6 @@ class ScanPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('ScanPage');
     return Scaffold(
       appBar: AppBar(
         title: Text('EasyBLE'),

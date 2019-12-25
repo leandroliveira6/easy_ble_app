@@ -28,13 +28,10 @@ class _ServiceListWidgetState extends State<ServiceListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print('ServiceListWidget');
     return StreamBuilder(
       stream: deviceState,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
-        print('ServiceListWidget deviceState');
         if (snapshot.hasData) {
-          print('ServiceListWidget deviceState ${snapshot.data}');
           if (snapshot.data == DeviceState.conectado) {
             return FutureBuilder(
               future: deviceBloc.getServices(widget.device),

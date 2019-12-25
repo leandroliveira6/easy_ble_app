@@ -25,7 +25,6 @@ class _DevicePageState extends State<DevicePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('DevicePage');
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.device.name),

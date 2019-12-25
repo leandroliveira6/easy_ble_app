@@ -24,7 +24,6 @@ class _CharacteristicDetailOutputWidgetState
 
   @override
   Widget build(BuildContext context) {
-    print('CharacteristicDetailOutputWidget');
     return StreamBuilder(
       stream: characteristicStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {

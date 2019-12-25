@@ -29,13 +29,13 @@ class DeviceBloc extends BlocBase {
     if (device.name.startsWith('EasyBLE')) {
       _updateDeviceState(DeviceState.conectando);
       device
-          .connect()
-          .then((onValue) => _deviceConnected(device))
-          .catchError((onError) => _updateDeviceState(DeviceState.erro))
-          .timeout(
-            Duration(seconds: 12),
-            onTimeout: () => _updateDeviceState(DeviceState.erro)
-          );
+      .connect()
+      .then((onValue) => _deviceConnected(device))
+      .catchError((onError) => _updateDeviceState(DeviceState.erro))
+      .timeout(
+        Duration(seconds: 12),
+        onTimeout: () => _updateDeviceState(DeviceState.erro)
+      );
     } else {
       _updateDeviceState(DeviceState.incompativel);
     }
@@ -103,16 +103,12 @@ class DeviceBloc extends BlocBase {
       .monitor()
       .listen(
         (valorCodificado) => characteristicStreamController.sink.add(utf8.decode(valorCodificado)),
-        onError: (error) => print('Bluetooth desconectado. Monitoramento encerrado: $error'), 
+        onError: (error) => print('Bluetooth desconectado. Monitoramento encerrado: $error'),
         onDone: () => _characteristicStreamControllers.remove(characteristic.uuid)
       );
     }
-    _initStream(characteristicStreamController.sink, characteristic.read());
+    Future.microtask(() async => characteristicStreamController.sink.add(utf8.decode(await characteristic.read())));
     return characteristicStreamController.stream;
-  }
-
-  void _initStream(Sink sink, Future value) async {
-    sink.add(utf8.decode(await value));
   }
 
   @override
