@@ -8,7 +8,7 @@ import 'package:rxdart/rxdart.dart';
 enum DeviceState { conectado, conectando, desconectado, erro, incompativel }
 
 class DeviceBloc extends BlocBase {
-  List _characteristicStreamControllers = List();
+  Map _characteristicStreamControllers = Map();
   Map _connectedDevices = Map();
   final _deviceStateController = BehaviorSubject<DeviceState>();
   Stream<DeviceState> get deviceState => _deviceStateController.stream;
@@ -93,19 +93,26 @@ class DeviceBloc extends BlocBase {
   }
 
   Stream getCharacteristicStream(Characteristic characteristic) {
-    final characteristicStreamController = PublishSubject();
-    characteristic.monitor().listen((valorCodificado) {
-      characteristicStreamController.sink.add(utf8.decode(valorCodificado));
-    });
-    _characteristicStreamControllers.add(characteristicStreamController);
-    return characteristicStreamController.stream;
+    if (!_characteristicStreamControllers.containsKey(characteristic.uuid)) {
+      final characteristicStreamController = BehaviorSubject();
+      characteristic.monitor().listen((valorCodificado) {
+        characteristicStreamController.sink.add(utf8.decode(valorCodificado));
+      });
+      _characteristicStreamControllers[characteristic.uuid] =
+          characteristicStreamController;
+    }
+    _initStream(_characteristicStreamControllers[characteristic.uuid].sink, characteristic.read());
+    return _characteristicStreamControllers[characteristic.uuid].stream;
+  }
+
+  void _initStream(Sink sink, Future value) async {
+    sink.add(utf8.decode(await value));
   }
 
   @override
   void dispose() {
     _deviceStateController.close();
-    for (var characteristicStreamController
-        in _characteristicStreamControllers) {
+    for (var characteristicStreamController in _characteristicStreamControllers.values) {
       characteristicStreamController.close();
     }
     super.dispose();
