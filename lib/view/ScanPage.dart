@@ -13,33 +13,24 @@ class ScanPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('EasyBLE'),
       ),
-      body: Column(
-        children: <Widget>[
-          Text(
-            'Dispositivos próximos',
-            style: TextStyle(height: 2, fontSize: 20),
-          ),
-          Expanded(
-            child: DeviceListWidget(),
-          )
-        ],
-      ),
+      body: DeviceListWidget(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (!await BlocProvider.getBloc<BluetoothBloc>().updateDeviceList()) {
             showDialog<void>(
               context: context,
               builder: (BuildContext context) {
-                return SimpleDialog(
-                  title: Center(child: Text('Atenção')),
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                          'O bluetooth precisa estar ligado para efetuar essa ação.',
-                          overflow: TextOverflow.clip),
-                    )
-                  ],
+                return AlertDialog(
+                  title: Text(
+                    'Atenção',
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 1.5,
+                  ),
+                  content: Text(
+                    'O bluetooth precisa estar ativado para efetuar essa ação.',
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 1.2,
+                  ),
                 );
               },
             );

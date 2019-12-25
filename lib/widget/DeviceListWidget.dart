@@ -36,15 +36,36 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData) {
                   if (snapshot.data.isNotEmpty) {
-                    return ListView.builder(
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return DeviceCardWidget(snapshot.data[index]);
-                      },
+                    return Column(
+                      children: <Widget>[
+                        Text(
+                          'Dispositivos próximos',
+                          style: TextStyle(height: 2, fontSize: 20),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: snapshot.data.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return DeviceCardWidget(snapshot.data[index]);
+                            },
+                          ),
+                        )
+                      ],
                     );
                   } else {
                     return Center(
-                        child: Text('Não existem dispositivos BLE próximos.'));
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.gps_off, size: 260, color: Colors.grey),
+                          Text(
+                            'Não existem dispositivos BLE próximos. Experimente ativar o GPS.',
+                            textScaleFactor: 1.2,
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    );
                   }
                 }
                 return Center(child: CircularProgressIndicator());
@@ -52,9 +73,17 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
             );
           } else {
             return Center(
-                child: Text(
-                    'Não é possivel exibir a lista de dispositivos BLE próximos com o bluetooth do aparelho desativado. '
-                    'Por favor, ative o bluetooth e pressione o botão de atualizar.'));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.bluetooth_disabled, size: 260, color: Colors.grey),
+                  Text(
+                    'Bluetooth desativado',
+                    textScaleFactor: 1.2,
+                  ),
+                ],
+              ),
+            );
           }
         }
         return Center(child: CircularProgressIndicator());

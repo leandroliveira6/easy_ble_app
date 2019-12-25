@@ -9,12 +9,10 @@ class CharacteristicDetailInputWidget extends StatefulWidget {
       : super(key: key);
 
   @override
-  _CharacteristicDetailInputWidgetState createState() =>
-      _CharacteristicDetailInputWidgetState();
+  _CharacteristicDetailInputWidgetState createState() => _CharacteristicDetailInputWidgetState();
 }
 
-class _CharacteristicDetailInputWidgetState
-    extends State<CharacteristicDetailInputWidget> {
+class _CharacteristicDetailInputWidgetState extends State<CharacteristicDetailInputWidget> {
   final _inputTextController = TextEditingController();
 
   @override
@@ -24,13 +22,14 @@ class _CharacteristicDetailInputWidgetState
       controller: _inputTextController,
       decoration: InputDecoration(
         labelText: "Valor a enviar",
-        //labelStyle: TextStyle(fontSize: 16),
         border: OutlineInputBorder(),
         suffixIcon: IconButton(
           icon: Icon(Icons.send),
-          onPressed: () => BlocProvider.getBloc<DeviceBloc>()
-              .writeCharacteristic(
-                  widget.characteristic, _inputTextController.text),
+          onPressed: () =>
+              BlocProvider.getBloc<DeviceBloc>().writeCharacteristic(
+            widget.characteristic,
+            _inputTextController.text,
+          ),
         ),
       ),
     );

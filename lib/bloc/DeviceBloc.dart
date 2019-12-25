@@ -32,8 +32,10 @@ class DeviceBloc extends BlocBase {
           .connect()
           .then((onValue) => _deviceConnected(device))
           .catchError((onError) => _updateDeviceState(DeviceState.erro))
-          .timeout(Duration(seconds: 10),
-              onTimeout: () => _updateDeviceState(DeviceState.erro));
+          .timeout(
+            Duration(seconds: 12),
+            onTimeout: () => _updateDeviceState(DeviceState.erro)
+          );
     } else {
       _updateDeviceState(DeviceState.incompativel);
     }
@@ -44,8 +46,7 @@ class DeviceBloc extends BlocBase {
       await device
           .disconnectOrCancelConnection()
           .then((onValue) => _updateDeviceState(DeviceState.desconectado))
-          .catchError(
-              (onError) => print('Erro ao desconectar device: $onError'));
+          .catchError((onError) => print('Erro ao desconectar device: $onError'));
       return true;
     }
     return false;
@@ -73,8 +74,7 @@ class DeviceBloc extends BlocBase {
   }
 
   Future<List<String>> getDescriptors(Characteristic characteristic) async {
-    final descriptors = await characteristic.service
-        .descriptorsForCharacteristic(characteristic.uuid);
+    final descriptors = await characteristic.service.descriptorsForCharacteristic(characteristic.uuid);
     List<String> decodedDescriptorsValues = List<String>();
     for (var descriptor in descriptors) {
       decodedDescriptorsValues.add(await readDescriptor(descriptor));
@@ -93,16 +93,22 @@ class DeviceBloc extends BlocBase {
   }
 
   Stream getCharacteristicStream(Characteristic characteristic) {
-    if (!_characteristicStreamControllers.containsKey(characteristic.uuid)) {
-      final characteristicStreamController = BehaviorSubject();
-      characteristic.monitor().listen((valorCodificado) {
-        characteristicStreamController.sink.add(utf8.decode(valorCodificado));
-      });
-      _characteristicStreamControllers[characteristic.uuid] =
-          characteristicStreamController;
+    BehaviorSubject characteristicStreamController;
+    if (_characteristicStreamControllers.containsKey(characteristic.uuid)) {
+      characteristicStreamController = _characteristicStreamControllers[characteristic.uuid];
+    } else {
+      characteristicStreamController = BehaviorSubject();
+      _characteristicStreamControllers[characteristic.uuid] = characteristicStreamController;
+      characteristic
+      .monitor()
+      .listen(
+        (valorCodificado) => characteristicStreamController.sink.add(utf8.decode(valorCodificado)),
+        onError: (error) => print('Bluetooth desconectado. Monitoramento encerrado: $error'), 
+        onDone: () => _characteristicStreamControllers.remove(characteristic.uuid)
+      );
     }
-    _initStream(_characteristicStreamControllers[characteristic.uuid].sink, characteristic.read());
-    return _characteristicStreamControllers[characteristic.uuid].stream;
+    _initStream(characteristicStreamController.sink, characteristic.read());
+    return characteristicStreamController.stream;
   }
 
   void _initStream(Sink sink, Future value) async {

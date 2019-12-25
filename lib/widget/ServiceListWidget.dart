@@ -52,20 +52,61 @@ class _ServiceListWidgetState extends State<ServiceListWidget> {
                     );
                   } else {
                     return Center(
-                        child: Text('Não há serviços para este dispositivo'));
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Icon(Icons.widgets, size: 260, color: Colors.grey),
+                          Text(
+                            'Não há serviços para este dispositivo',
+                            textScaleFactor: 1.2,
+                          ),
+                        ],
+                      ),
+                    );
                   }
                 }
                 return Center(child: CircularProgressIndicator());
               },
             );
           } else if (snapshot.data == DeviceState.desconectado) {
-            return Center(child: Text('Dispositivo desconectado'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.bluetooth, size: 260, color: Colors.grey),
+                  Text(
+                    'Dispositivo desconectado',
+                    textScaleFactor: 1.2,
+                  ),
+                ],
+              ),
+            );
           } else if (snapshot.data == DeviceState.incompativel) {
             return Center(
-                child: Text('Dispositivo incompativel com a aplicação'));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.device_unknown, size: 260, color: Colors.grey),
+                  Text(
+                    'Dispositivo incompativel com a aplicação',
+                    textScaleFactor: 1.2,
+                  ),
+                ],
+              ),
+            );
           } else if (snapshot.data == DeviceState.erro) {
             return Center(
-                child: Text('Erro ao tentar se conectar ao dispositivo'));
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.error_outline, size: 260, color: Colors.redAccent),
+                  Text(
+                    'Erro ao tentar se conectar ao dispositivo',
+                    textScaleFactor: 1.2,
+                  ),
+                ],
+              ),
+            );
           }
         }
         return Center(child: CircularProgressIndicator());

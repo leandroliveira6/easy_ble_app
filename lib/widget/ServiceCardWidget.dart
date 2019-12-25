@@ -12,7 +12,6 @@ class ServiceCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('ServiceCardWidget');
     return FutureBuilder(
       future: BlocProvider.getBloc<DeviceBloc>().getCharacteristics(service),
       builder: (BuildContext context, AsyncSnapshot snapshot) {

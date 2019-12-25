@@ -8,7 +8,6 @@ class DeviceCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('DeviceCardWidget');
     return Card(
       child: ListTile(
         title: Text(scanResult.peripheral.name),

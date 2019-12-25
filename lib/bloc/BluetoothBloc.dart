@@ -50,7 +50,7 @@ class BluetoothBloc extends BlocBase {
       });
       scanStream.onError((e) => print('Não foi possivel escanear: $e'));
       scanStream.onDone(() => scanStream.cancel());
-      Future.delayed(Duration(seconds: 5), () {
+      Future.delayed(Duration(seconds: 6), () {
         _bluetooth.stopPeripheralScan();
         _scanResultController.sink.add(_deviceMap.values.toList());
       });

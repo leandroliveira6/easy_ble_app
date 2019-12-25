@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 class CharacteristicDetailSwitchWidget extends StatelessWidget {
   final characteristic;
 
-  CharacteristicDetailSwitchWidget(this.characteristic, {Key key})
-      : super(key: key);
+  CharacteristicDetailSwitchWidget(this.characteristic, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -20,8 +20,8 @@ class ServiceWidget extends StatelessWidget {
               snapshot.data[0],
               overflow: TextOverflow.clip,
               softWrap: false,
-            ), //Text(snapshot.data[0]),
-            subtitle: Text(snapshot.data[1]), //Text(snapshot.data[1]),
+            ),
+            subtitle: Text(snapshot.data[1]),
           );
         }
         return Center(child: CircularProgressIndicator());

@@ -4,12 +4,10 @@ import 'CharacteristicItemWidget.dart';
 
 class CharacteristicListWidget extends StatelessWidget {
   final characteristics;
-  const CharacteristicListWidget(this.characteristics, {Key key})
-      : super(key: key);
+  const CharacteristicListWidget(this.characteristics, {Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print("CharacteristicListWidget");
     return ListView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),

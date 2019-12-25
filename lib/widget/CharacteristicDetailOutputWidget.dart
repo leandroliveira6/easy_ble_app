@@ -5,12 +5,10 @@ import 'package:flutter/material.dart';
 class CharacteristicDetailOutputWidget extends StatefulWidget {
   final characteristic;
 
-  CharacteristicDetailOutputWidget(this.characteristic, {Key key})
-      : super(key: key);
+  CharacteristicDetailOutputWidget(this.characteristic, {Key key}) : super(key: key);
 
   @override
-  _CharacteristicDetailOutputWidgetState createState() =>
-      _CharacteristicDetailOutputWidgetState();
+  _CharacteristicDetailOutputWidgetState createState() => _CharacteristicDetailOutputWidgetState();
 }
 
 class _CharacteristicDetailOutputWidgetState
@@ -20,8 +18,7 @@ class _CharacteristicDetailOutputWidgetState
 
   @override
   void initState() {
-    characteristicStream = BlocProvider.getBloc<DeviceBloc>()
-        .getCharacteristicStream(widget.characteristic);
+    characteristicStream = BlocProvider.getBloc<DeviceBloc>().getCharacteristicStream(widget.characteristic);
     super.initState();
   }
 

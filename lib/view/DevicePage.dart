@@ -40,7 +40,7 @@ class _DevicePageState extends State<DevicePage> {
                   Navigator.pop(context);
                 });
                 return IconButton(
-                  icon: Icon(Icons.check_box, color: Colors.greenAccent),
+                  icon: Icon(Icons.bluetooth_connected, color: Colors.greenAccent),
                   onPressed: () async {
                     var desconectou = await BlocProvider.getBloc<DeviceBloc>()
                         .disconnectDevice(widget.device);
@@ -53,7 +53,7 @@ class _DevicePageState extends State<DevicePage> {
                 );
               }
               return IconButton(
-                icon: Icon(Icons.check_box_outline_blank),
+                icon: Icon(Icons.bluetooth_audio),
                 onPressed: () {
                   setState(() {
                     BlocProvider.getBloc<DeviceBloc>()
