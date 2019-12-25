@@ -23,7 +23,6 @@ class _ServiceListWidgetState extends State<ServiceListWidget> {
   void initState() {
     deviceBloc = BlocProvider.getBloc<DeviceBloc>();
     deviceState = deviceBloc.deviceState;
-    deviceServices = deviceBloc.services;
     super.initState();
   }
 
@@ -37,8 +36,8 @@ class _ServiceListWidgetState extends State<ServiceListWidget> {
         if (snapshot.hasData) {
           print('ServiceListWidget deviceState ${snapshot.data}');
           if (snapshot.data == DeviceState.conectado) {
-            return StreamBuilder(
-              stream: deviceServices,
+            return FutureBuilder(
+              future: deviceBloc.getServices(widget.device),
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData) {
                   if (snapshot.data.isNotEmpty) {

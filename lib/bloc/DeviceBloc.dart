@@ -13,9 +13,6 @@ class DeviceBloc extends BlocBase {
   final _deviceStateController = BehaviorSubject<DeviceState>();
   Stream<DeviceState> get deviceState => _deviceStateController.stream;
 
-  final _servicesController = PublishSubject<List<Service>>();
-  Stream<List<Service>> get services => _servicesController.stream;
-
   void checkDeviceState(Peripheral device) async {
     if (await device.isConnected()) {
       _deviceStateController.sink.add(DeviceState.conectado);
@@ -56,7 +53,6 @@ class DeviceBloc extends BlocBase {
 
   void _deviceConnected(Peripheral device) {
     _updateDeviceState(DeviceState.conectado);
-    _updateServices(device);
     _connectedDevices[device.identifier] = device.observeConnectionState();
   }
 
@@ -67,10 +63,9 @@ class DeviceBloc extends BlocBase {
     return null;
   }
 
-  void _updateServices(Peripheral device) {
-    device.discoverAllServicesAndCharacteristics().then((onValue) async {
-      _servicesController.sink.add(await device.services());
-    });
+  Future<List<Service>> getServices(Peripheral device) async {
+    await device.discoverAllServicesAndCharacteristics();
+    return await device.services();
   }
 
   Future<List<Characteristic>> getCharacteristics(Service service) async {
@@ -81,7 +76,7 @@ class DeviceBloc extends BlocBase {
     final descriptors = await characteristic.service
         .descriptorsForCharacteristic(characteristic.uuid);
     List<String> decodedDescriptorsValues = List<String>();
-    for(var descriptor in descriptors){
+    for (var descriptor in descriptors) {
       decodedDescriptorsValues.add(await readDescriptor(descriptor));
     }
     return decodedDescriptorsValues;
@@ -109,7 +104,6 @@ class DeviceBloc extends BlocBase {
   @override
   void dispose() {
     _deviceStateController.close();
-    _servicesController.close();
     for (var characteristicStreamController
         in _characteristicStreamControllers) {
       characteristicStreamController.close();
