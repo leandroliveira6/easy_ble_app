@@ -26,9 +26,7 @@ class ScanPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          if (await BlocProvider.getBloc<BluetoothBloc>().estaLigado()) {
-            BlocProvider.getBloc<BluetoothBloc>().atualizarDevices();
-          } else {
+          if (!await BlocProvider.getBloc<BluetoothBloc>().updateDeviceList()) {
             showDialog<void>(
               context: context,
               builder: (BuildContext context) {

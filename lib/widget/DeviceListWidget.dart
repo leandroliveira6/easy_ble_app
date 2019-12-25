@@ -13,14 +13,12 @@ class DeviceListWidget extends StatefulWidget {
 
 class _DeviceListWidgetState extends State<DeviceListWidget> {
   var _bluetoothState;
-  var _scanState;
   var _scanResult;
 
   @override
   void initState() {
     final bluetoothBloc = BlocProvider.getBloc<BluetoothBloc>();
-    _bluetoothState = bluetoothBloc.state;
-    _scanState = bluetoothBloc.scanState;
+    _bluetoothState = bluetoothBloc.bluetoothState;
     _scanResult = bluetoothBloc.scanResult;
     super.initState();
   }
@@ -34,30 +32,19 @@ class _DeviceListWidgetState extends State<DeviceListWidget> {
         if (snapshot.hasData) {
           if (snapshot.data) {
             return StreamBuilder(
-              stream: _scanState,
+              stream: _scanResult,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData) {
-                  if (snapshot.data == ScanState.pronto) {
-                    return StreamBuilder(
-                      stream: _scanResult,
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        if (snapshot.hasData) {
-                          if (snapshot.data.isNotEmpty) {
-                            return ListView.builder(
-                              itemCount: snapshot.data.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                return DeviceCardWidget(snapshot.data[index]);
-                              },
-                            );
-                          } else {
-                            return Center(
-                                child: Text(
-                                    'Não existem dispositivos BLE próximos.'));
-                          }
-                        }
-                        return Center(child: CircularProgressIndicator());
+                  if (snapshot.data.isNotEmpty) {
+                    return ListView.builder(
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return DeviceCardWidget(snapshot.data[index]);
                       },
                     );
+                  } else {
+                    return Center(
+                        child: Text('Não existem dispositivos BLE próximos.'));
                   }
                 }
                 return Center(child: CircularProgressIndicator());

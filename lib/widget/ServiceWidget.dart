@@ -1,3 +1,5 @@
+import 'package:bloc_pattern/bloc_pattern.dart';
+import 'package:easy_ble_app/bloc/DeviceBloc.dart';
 import 'package:flutter/material.dart';
 
 class ServiceWidget extends StatelessWidget {
@@ -8,22 +10,22 @@ class ServiceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print('ServiceWidget');
-    final descriptors = characteristic.descriptors;
-    if (descriptors.length != 2) {
-      return Center(
-        child: Text('Informações do serviço inválidas'),
-      );
-    }
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ListTile(
-        title: Text('${descriptors[0].value}',
-            overflow: TextOverflow.clip,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-        subtitle: Text('${descriptors[1].value}',
-            overflow: TextOverflow.clip,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      ),
+    return FutureBuilder(
+      future: BlocProvider.getBloc<DeviceBloc>().getDescriptors(characteristic),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        if (snapshot.hasData) {
+          print(snapshot.data);
+          return ListTile(
+            title: Text(
+              snapshot.data[0],
+              overflow: TextOverflow.clip,
+              softWrap: false,
+            ), //Text(snapshot.data[0]),
+            subtitle: Text(snapshot.data[1]), //Text(snapshot.data[1]),
+          );
+        }
+        return Center(child: CircularProgressIndicator());
+      },
     );
   }
 }

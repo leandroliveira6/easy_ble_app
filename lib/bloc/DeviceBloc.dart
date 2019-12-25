@@ -1,78 +1,119 @@
+import 'dart:async';
+import 'dart:convert';
+
 import 'package:bloc_pattern/bloc_pattern.dart';
-import 'package:flutter_blue/flutter_blue.dart';
+import 'package:flutter_ble_lib/flutter_ble_lib.dart';
 import 'package:rxdart/rxdart.dart';
 
 enum DeviceState { conectado, conectando, desconectado, erro, incompativel }
 
 class DeviceBloc extends BlocBase {
-  Map<DeviceIdentifier, bool> _devicesState = Map<DeviceIdentifier, bool>();
+  List _characteristicStreamControllers = List();
+  Map _connectedDevices = Map();
+  final _deviceStateController = BehaviorSubject<DeviceState>();
+  Stream<DeviceState> get deviceState => _deviceStateController.stream;
 
-  final _stateController = BehaviorSubject<DeviceState>();
-  Stream<DeviceState> get state => _stateController.stream;
-  Sink<DeviceState> get _updateState => _stateController.sink;
+  final _servicesController = PublishSubject<List<Service>>();
+  Stream<List<Service>> get services => _servicesController.stream;
 
-  void conectarDevice(BluetoothDevice device) {
-    _updateState.add(DeviceState.conectando);
-    if (_devicesState.containsKey(device.id) && _devicesState[device.id]) {
-      _updateState.add(DeviceState.conectado);
+  void checkDeviceState(Peripheral device) async {
+    if (await device.isConnected()) {
+      _deviceStateController.sink.add(DeviceState.conectado);
     } else {
-      device.connect(autoConnect: false).then((onData) {
-        if (device.type == BluetoothDeviceType.le &&
-            device.name.startsWith('EasyBLE')) {
-          _updateState.add(DeviceState.conectado);
-          _devicesState[device.id] = true;
-        } else {
-          _updateState.add(DeviceState.incompativel);
-          device.disconnect();
-        }
-      }).catchError((onError) {
-        _updateState.add(DeviceState.erro);
-      }).timeout(Duration(seconds: 5), onTimeout: () {
-        _updateState.add(DeviceState.erro);
-      });
+      _deviceStateController.sink.add(DeviceState.desconectado);
     }
   }
 
-  void desconectarDevice(BluetoothDevice device) {
-    _updateState.add(DeviceState.conectando);
-    if (_devicesState.containsKey(device.id) && !_devicesState[device.id]) {
-      _updateState.add(DeviceState.desconectado);
+  void _updateDeviceState(DeviceState newDeviceState) {
+    _deviceStateController.sink.add(newDeviceState);
+  }
+
+  void connectDevice(Peripheral device) async {
+    if (device.name.startsWith('EasyBLE')) {
+      _updateDeviceState(DeviceState.conectando);
+      device
+          .connect()
+          .then((onValue) => _deviceConnected(device))
+          .catchError((onError) => _updateDeviceState(DeviceState.erro))
+          .timeout(Duration(seconds: 10),
+              onTimeout: () => _updateDeviceState(DeviceState.erro));
     } else {
-      device.disconnect().then((onData) {
-        _updateState.add(DeviceState.desconectado);
-        _devicesState[device.id] = false;
-      }).catchError(_deviceErro);
+      _updateDeviceState(DeviceState.incompativel);
     }
   }
 
-  void _deviceErro(onError) {
-    _updateState.add(DeviceState.erro);
-  }
-
-  Future<List> obterServicos(device) {
-    return device.discoverServices();
-  }
-
-  bool estaConectado(device) {
-    if (_devicesState.containsKey(device.id) && _devicesState[device.id]) {
+  Future<bool> disconnectDevice(Peripheral device) async {
+    if (await device.isConnected()) {
+      await device
+          .disconnectOrCancelConnection()
+          .then((onValue) => _updateDeviceState(DeviceState.desconectado))
+          .catchError(
+              (onError) => print('Erro ao desconectar device: $onError'));
       return true;
-    } else {
-      return false;
+    }
+    return false;
+  }
+
+  void _deviceConnected(Peripheral device) {
+    _updateDeviceState(DeviceState.conectado);
+    _updateServices(device);
+    _connectedDevices[device.identifier] = device.observeConnectionState();
+  }
+
+  Stream getDeviceConnectionState(Peripheral device) {
+    if (_connectedDevices.containsKey(device.identifier)) {
+      return _connectedDevices[device.identifier];
+    }
+    return null;
+  }
+
+  void _updateServices(Peripheral device) {
+    device.discoverAllServicesAndCharacteristics().then((onValue) async {
+      _servicesController.sink.add(await device.services());
+    });
+  }
+
+  Future<List<Characteristic>> getCharacteristics(Service service) async {
+    return await service.characteristics();
+  }
+
+  Future<List<String>> getDescriptors(Characteristic characteristic) async {
+    final descriptors = await characteristic.service
+        .descriptorsForCharacteristic(characteristic.uuid);
+    List<String> decodedDescriptorsValues = List<String>();
+    for(var descriptor in descriptors){
+      decodedDescriptorsValues.add(await readDescriptor(descriptor));
+    }
+    return decodedDescriptorsValues;
+  }
+
+  Future<String> readDescriptor(Descriptor descriptor) async {
+    return utf8.decode(await descriptor.read());
+  }
+
+  void writeCharacteristic(Characteristic characteristic, String value) async {
+    if (await characteristic.service.peripheral.isConnected()) {
+      await characteristic.write(utf8.encode(value), false);
     }
   }
 
-  void atualizarEstado(device) {
-    print('DeviceBloc atualizarEstado');
-    if (estaConectado(device)) {
-      _updateState.add(DeviceState.conectado);
-    } else {
-      _updateState.add(DeviceState.desconectado);
-    }
+  Stream getCharacteristicStream(Characteristic characteristic) {
+    final characteristicStreamController = PublishSubject();
+    characteristic.monitor().listen((valorCodificado) {
+      characteristicStreamController.sink.add(utf8.decode(valorCodificado));
+    });
+    _characteristicStreamControllers.add(characteristicStreamController);
+    return characteristicStreamController.stream;
   }
 
   @override
   void dispose() {
-    _stateController.close();
+    _deviceStateController.close();
+    _servicesController.close();
+    for (var characteristicStreamController
+        in _characteristicStreamControllers) {
+      characteristicStreamController.close();
+    }
     super.dispose();
   }
 }

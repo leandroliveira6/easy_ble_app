@@ -1,4 +1,5 @@
 import 'package:bloc_pattern/bloc_pattern.dart';
+import 'package:easy_ble_app/bloc/BluetoothBloc.dart';
 import 'package:easy_ble_app/bloc/DeviceBloc.dart';
 import 'package:flutter/material.dart';
 
@@ -21,7 +22,8 @@ class _ServiceListWidgetState extends State<ServiceListWidget> {
   @override
   void initState() {
     deviceBloc = BlocProvider.getBloc<DeviceBloc>();
-    deviceState = deviceBloc.state;
+    deviceState = deviceBloc.deviceState;
+    deviceServices = deviceBloc.services;
     super.initState();
   }
 
@@ -35,15 +37,18 @@ class _ServiceListWidgetState extends State<ServiceListWidget> {
         if (snapshot.hasData) {
           print('ServiceListWidget deviceState ${snapshot.data}');
           if (snapshot.data == DeviceState.conectado) {
-            return FutureBuilder(
-              future: deviceBloc.obterServicos(widget.device),
+            return StreamBuilder(
+              stream: deviceServices,
               builder: (BuildContext context, AsyncSnapshot snapshot) {
                 if (snapshot.hasData) {
                   if (snapshot.data.isNotEmpty) {
+                    final servicos = snapshot.data
+                        .getRange(2, snapshot.data.length)
+                        .toList();
                     return ListView.builder(
-                      itemCount: snapshot.data.length,
+                      itemCount: servicos.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return ServiceCardWidget(snapshot.data[index]);
+                        return ServiceCardWidget(servicos[index]);
                       },
                     );
                   } else {

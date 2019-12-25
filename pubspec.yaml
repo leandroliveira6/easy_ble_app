@@ -24,8 +24,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   bloc_pattern: ^2.5.1
-  #rxdart: ^0.23.1
-  flutter_blue: ^0.6.3+1
+  flutter_ble_lib: #^2.0.1
+    git:
+      url: https://github.com/Polidea/FlutterBleLib.git
+      ref: feature/descriptors
+  rxdart: ^0.23.1
+  #flutter_blue: ^0.6.3+1
+  #synchronized: ^2.1.1
 
 dev_dependencies:
   flutter_test:

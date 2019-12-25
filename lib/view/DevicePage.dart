@@ -17,10 +17,9 @@ class _DevicePageState extends State<DevicePage> {
 
   @override
   void initState() {
-    print('teste');
     final deviceBloc = BlocProvider.getBloc<DeviceBloc>();
-    deviceState = deviceBloc.state;
-    deviceBloc.atualizarEstado(widget.device);
+    deviceState = deviceBloc.deviceState;
+    deviceBloc.checkDeviceState(widget.device);
     super.initState();
   }
 
@@ -35,13 +34,21 @@ class _DevicePageState extends State<DevicePage> {
             stream: deviceState,
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               if (snapshot.hasData && snapshot.data == DeviceState.conectado) {
+                BlocProvider.getBloc<DeviceBloc>()
+                    .getDeviceConnectionState(widget.device)
+                    .handleError((onError) {
+                  Navigator.pop(context);
+                });
                 return IconButton(
                   icon: Icon(Icons.check_box, color: Colors.greenAccent),
-                  onPressed: () {
-                    setState(() {
-                      BlocProvider.getBloc<DeviceBloc>()
-                          .desconectarDevice(widget.device);
-                    });
+                  onPressed: () async {
+                    var desconectou = await BlocProvider.getBloc<DeviceBloc>()
+                        .disconnectDevice(widget.device);
+                    if (!desconectou) {
+                      setState(() {
+                        Navigator.pop(context);
+                      });
+                    }
                   },
                 );
               }
@@ -50,7 +57,7 @@ class _DevicePageState extends State<DevicePage> {
                 onPressed: () {
                   setState(() {
                     BlocProvider.getBloc<DeviceBloc>()
-                        .conectarDevice(widget.device);
+                        .connectDevice(widget.device);
                   });
                 },
               );
