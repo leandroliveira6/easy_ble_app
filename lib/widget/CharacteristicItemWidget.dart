@@ -29,9 +29,9 @@ class CharacteristicItemWidget extends StatelessWidget {
           Widget detail;
           if (characteristic.isReadable) {
             detail = CharacteristicDetailOutputWidget(characteristic);
-          } else if (characteristic.isWritableWithResponse) {
-            detail = CharacteristicDetailInputWidget(characteristic);
           } else if (characteristic.isWritableWithoutResponse) {
+            detail = CharacteristicDetailInputWidget(characteristic);
+          } else if (characteristic.isWritableWithResponse) {
             detail = CharacteristicDetailSwitchWidget(characteristic);
           }
 
