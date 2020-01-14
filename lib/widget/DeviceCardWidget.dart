@@ -10,12 +10,15 @@ class DeviceCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(scanResult.peripheral.name),
+        title: Text(scanResult.peripheral.name != null
+            ? scanResult.peripheral.name
+            : 'Dispositivo sem nome'),
         subtitle: Text('${scanResult.rssi}'),
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DevicePage(scanResult.peripheral)),
+            MaterialPageRoute(
+                builder: (context) => DevicePage(scanResult.peripheral)),
           );
         },
       ),

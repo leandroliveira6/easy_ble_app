@@ -27,7 +27,7 @@ class _DevicePageState extends State<DevicePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.device.name),
+        title: Text(widget.device.name != null ? widget.device.name : 'Dispositivo sem nome'),
         actions: <Widget>[
           StreamBuilder(
             stream: deviceState,
